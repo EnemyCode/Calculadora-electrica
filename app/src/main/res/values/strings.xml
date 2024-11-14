@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Calculadora Electrica</string>
+    <string name="enun">"Una calculadora simple y rapida con la que podras resolver calculos electricos y poder exportar dichos calculos al final de su uso. Si recuerdas de como usar las calculadoras que imprimian los calculos a papel, esta es tu app."</string>
+</resources>
