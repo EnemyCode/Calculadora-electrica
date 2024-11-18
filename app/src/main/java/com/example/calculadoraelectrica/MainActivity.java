@@ -21,8 +21,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.color.DynamicColors;
 
+import org.w3c.dom.Document;
+
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,9 +75,21 @@ public class MainActivity extends AppCompatActivity {
 
         this.deleteDatabase(BBDD_NAME);
         dataBaseConnection = new Conexion(this, BBDD_NAME, null, 1);
+
+        try {
+            GenerarXML generador = new GenerarXML();
+            generador.generarDocumento();
+            String path = getExternalFilesDir(null).getAbsolutePath();
+            generador.crearDocumento(path);
+            Toast.makeText(MainActivity.this,path, Toast.LENGTH_LONG).show();
+        } catch (ParserConfigurationException | IOException | TransformerException | NullPointerException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     //BOTONES Y SEÑALES
+
     @SuppressLint("SetTextI18n")
     public void calcularButton(View v){
         try {
@@ -87,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
             bdview.setAdapter(null);
             toListView.clear();
-
 
             DBopen();
             ContentValues nuevoRegistro = new ContentValues();
@@ -110,8 +127,9 @@ public class MainActivity extends AppCompatActivity {
 
             while (c.moveToNext()){
 
-                @SuppressLint("DefaultLocale") String query = String.format("%d %s %.2fmm²",c.getInt(0),
-                        c.getString(1),c.getDouble(7));
+                @SuppressLint("DefaultLocale") String query = String.format("%d %s %.2fmm², Tensión: %.2fV, Caida de tension: %.2f, Longitud: %.2fm, Intensidad: %.2fA, Factor %.2f,",c.getInt(0),
+                        c.getString(1),c.getDouble(7),c.getDouble(2),c.getDouble(3),c.getDouble(4),
+                        c.getDouble(5),c.getDouble(6));
                 toListView.add(query);
             }
             c.close();
