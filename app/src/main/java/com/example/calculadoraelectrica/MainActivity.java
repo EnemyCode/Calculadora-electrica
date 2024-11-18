@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             bdview.setAdapter(null);
             toListView.clear();
 
+
             DBopen();
             ContentValues nuevoRegistro = new ContentValues();
 
