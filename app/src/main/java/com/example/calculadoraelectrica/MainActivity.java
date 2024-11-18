@@ -76,15 +76,7 @@ public class MainActivity extends AppCompatActivity {
         this.deleteDatabase(BBDD_NAME);
         dataBaseConnection = new Conexion(this, BBDD_NAME, null, 1);
 
-        try {
-            GenerarXML generador = new GenerarXML();
-            generador.generarDocumento();
-            String path = getExternalFilesDir(null).getAbsolutePath();
-            generador.crearDocumento(path);
-            Toast.makeText(MainActivity.this,path, Toast.LENGTH_LONG).show();
-        } catch (ParserConfigurationException | IOException | TransformerException | NullPointerException e) {
-            throw new RuntimeException(e);
-        }
+
 
     }
 
@@ -145,6 +137,25 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Datos introducidos", Toast.LENGTH_LONG).show();
             }
         }
+
+    public void exportarXml(View v){
+
+        try {
+            DBopen();
+            Cursor c = db.rawQuery("SELECT * FROM " + "Calculos",null);
+            String path = getExternalFilesDir(null).getAbsolutePath();
+
+            GenerarXML generador = new GenerarXML();
+            generador.generarDocumento(c);
+            generador.crearDocumento(path);
+
+            c.close();
+            DBclose();
+            Toast.makeText(MainActivity.this,path, Toast.LENGTH_LONG).show();
+        } catch (ParserConfigurationException | IOException | TransformerException | NullPointerException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     //METODOS PARA HANDLING Y GESTION DE BBDD
 
