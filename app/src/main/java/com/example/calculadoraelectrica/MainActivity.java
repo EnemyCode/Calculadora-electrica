@@ -27,15 +27,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     TextView total;
-    EditText voltage;
-    EditText downVolt;
-    EditText amper;
-    EditText longer;
-    EditText factor;
-    RadioButton cuWire;
-    RadioButton alWire;
-    RadioButton trif;
-    RadioButton mono;
+    EditText voltage, downVolt, amper, longer, factor, calcName;
+    RadioButton cuWire, alWire, trif, mono;
     ListView bdview;
 
     DecimalFormat df = new DecimalFormat("#.00");
@@ -47,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private long insertion;
 
     String BBDD_NAME = "CalcDataBase";
+
+    Double resultado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         trif = findViewById(R.id.Trif);
         mono = findViewById(R.id.Mono);
         bdview = findViewById(R.id.bdview);
+        calcName = findViewById(R.id.nombre);
 
         this.deleteDatabase(BBDD_NAME);
         dataBaseConnection = new Conexion(this, BBDD_NAME, null, 1);
@@ -79,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     public void calcularButton(View v){
         try {
-            total.setText("Resultado: "+df.format(Operar.operar(voltage, downVolt, amper, longer, factor,cuWire,alWire,trif,mono))+"mm²");
+            resultado = Operar.operar(voltage, downVolt, amper, longer, factor, cuWire, alWire, trif, mono);
+            total.setText("Cable: "+ df.format(resultado) + "mm²");
         }
         catch (Exception e){
             Toast.makeText(MainActivity.this, "Error en datos introducidos, por favor, reviselo", Toast.LENGTH_LONG).show();
@@ -94,19 +91,26 @@ public class MainActivity extends AppCompatActivity {
             DBopen();
             ContentValues nuevoRegistro = new ContentValues();
 
-            nuevoRegistro.put("Voltage", getDoubleData(voltage));
-            nuevoRegistro.put("CaidaVoltage", getDoubleData(downVolt));
-            nuevoRegistro.put("Longitud", getDoubleData(longer));
-            nuevoRegistro.put("Intensidad", getDoubleData(amper));
-            nuevoRegistro.put("FactorPotencia", getDoubleData(factor));
-            //ME FALTA AÑADIR EL RESULTADO
+            if (calcName.getText().toString().equals("")){
+                nuevoRegistro.put("NombreCalculo", "cable de:");
+            }else{
+                nuevoRegistro.put("NombreCalculo", calcName.getText().toString());
+            }
+            nuevoRegistro.put("Voltage", toDouble(voltage));
+            nuevoRegistro.put("CaidaVoltage", toDouble(downVolt));
+            nuevoRegistro.put("Longitud", toDouble(longer));
+            nuevoRegistro.put("Intensidad", toDouble(amper));
+            nuevoRegistro.put("FactorPotencia", toDouble(factor));
+            nuevoRegistro.put("TotalCalculo", resultado);
 
             insertion = db.insert("Calculos", null, nuevoRegistro);
 
             Cursor c = db.rawQuery("SELECT * FROM " + "Calculos",null);
 
             while (c.moveToNext()){
-                @SuppressLint("DefaultLocale") String query = String.format("%d %s %s %s %s",c.getInt(0),df.format(c.getDouble(1)),df.format(c.getDouble(2)),df.format(c.getDouble(3)),df.format(c.getDouble(4)));
+
+                @SuppressLint("DefaultLocale") String query = String.format("%d %s %.2fmm²",c.getInt(0),
+                        c.getString(1),c.getDouble(7));
                 toListView.add(query);
             }
             c.close();
@@ -123,12 +127,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-    public void clearBD(View v){
-        DBclose();
-
-        DBclose();
-    }
-
     //METODOS PARA HANDLING Y GESTION DE BBDD
 
     public void DBopen(){
@@ -138,12 +136,10 @@ public class MainActivity extends AppCompatActivity {
     public void DBclose(){
         dataBaseConnection.close();
     }
+
     //METODOS DE SETTEO DE DATOS
 
-    public double getDoubleData(EditText dv){
+    public double toDouble(EditText dv){
         return Double.parseDouble(dv.getText().toString());
     }
-
-
-
 }
