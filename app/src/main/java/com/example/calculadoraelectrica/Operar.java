@@ -2,6 +2,7 @@ package com.example.calculadoraelectrica;
 
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 public class Operar {
 
@@ -9,9 +10,9 @@ public class Operar {
         return Double.parseDouble(dv.getText().toString());
     }
 
-    public static double operar(EditText Volt, EditText dvolt, EditText Inten, EditText Long,
-                                EditText FactorP, RadioButton cuWire, RadioButton alWire,
-                                RadioButton trif, RadioButton mono) {
+    public static Double operar(EditText Volt, EditText dvolt, EditText Inten, EditText Long,
+                         EditText FactorP, RadioButton cuWire, RadioButton alWire,
+                         RadioButton trif, RadioButton mono) {
 
         double conduct = 0;
         double result = 0;
@@ -28,19 +29,16 @@ public class Operar {
         if (alWire.isChecked()) {
             conduct = 29.67;
         }
-
-        if (trif.isChecked()) {
-            result = ((Math.sqrt(3) * (I * L * FP)) / (((V * dv) / 100) * conduct));
-            return result;
+        if (conduct != 0) {
+            if (trif.isChecked()) {
+                result = ((Math.sqrt(3) * (I * L * FP)) / (((V * dv) / 100) * conduct));
+                return result;
+            }
+            if (mono.isChecked()) {
+                result = ((2 * (I * L * FP)) / (((V * dv) / 100) * conduct));
+                return result;
+            }
         }
-        if (mono.isChecked()) {
-            result = ((2 * (I * L * FP)) / (((V * dv) / 100) * conduct));
-            return result;
-        }
-        return 404;
-
-
+        return result + 404;
     }
-
-
 }

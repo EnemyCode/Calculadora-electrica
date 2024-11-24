@@ -75,9 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
         this.deleteDatabase(BBDD_NAME);
         dataBaseConnection = new Conexion(this, BBDD_NAME, null, 1);
-
-
-
     }
 
     //BOTONES Y SEÑALES
